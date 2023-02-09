@@ -2,8 +2,20 @@ package com.newcoder.community.service;
 
 import com.newcoder.community.dao.UserMapper;
 import com.newcoder.community.entity.User;
+import com.newcoder.community.util.CommunityConstant;
+import com.newcoder.community.util.CommunityUtil;
+import com.newcoder.community.util.MailClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * @author liuyang
@@ -12,13 +24,104 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class UserService {
+public class UserService implements CommunityConstant {
 
     @Autowired(required = false)
     private UserMapper userMapper;
 
+    @Autowired
+    private MailClient mailClient;
+
+    @Autowired(required = false)
+    private TemplateEngine templateEngine;
+
+    @Value("${community.path.domain}")
+    private String domain;
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+
     public User findUserById(int id){
         return userMapper.selectById(id);
     }
+
+
+    //处理注册业务
+    public Map<String,Object> register(User user){
+        Map<String, Object> map = new HashMap<>();
+
+        // 空值处理
+        if(user == null){
+            //IllegalArgumentException不合法的参数异常
+            throw new IllegalArgumentException("参数不能为空");
+        }
+        if(StringUtils.isBlank(user.getUsername())){
+            map.put("usernameMsg","账号不能为空");
+            return map;
+        }
+        if(StringUtils.isBlank(user.getPassword())){
+            map.put("passwordMsg","密码不能为空");
+            return map;
+        }
+        if(StringUtils.isBlank(user.getEmail())){
+            map.put("emailMsg","邮箱不能为空");
+            return map;
+        }
+
+        //验证账号
+        User u = userMapper.selectByName(user.getUsername());
+        if(u != null){
+            map.put("usernameMsg","该账号已存在!");
+            return map;
+        }
+
+        //验证邮箱
+        u = userMapper.selectByEmail(user.getEmail());
+        if(u != null){
+            map.put("emailMsg","该邮箱已被注册!");
+            return map;
+        }
+
+
+        //为新用户设置初始状态
+        user.setSalt(CommunityUtil.generateUUID().substring(0,5)); //5位随机字符串
+        user.setPassword(CommunityUtil.md5(user.getPassword() + user.getSalt())); // 用户输入密码+字符串进行MD5加密
+        user.setType(0); //普通用户
+        user.setStatus(0); //未激活
+        user.setActivationCode(CommunityUtil.generateUUID()); //系统随机分配激活码
+        user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png",new Random().nextInt(1000))); //设置随机头像
+        user.setCreateTime(new Date());
+        userMapper.insertUser(user);
+
+
+        //为用户发送激活邮件。模板html在 /mail/activation.html
+        Context context = new Context();
+        context.setVariable("email",user.getEmail());
+        // http://localhost:8080/community/activation/用户id/激活码
+        String url= domain + contextPath + "/activation/" + user.getId() + "/" + user.getActivationCode();
+        context.setVariable("url",url);
+        String content = templateEngine.process("/mail/activation", context);
+        mailClient.sendMail(user.getEmail(),"激活账号",content);
+        return map;
+    }
+
+
+
+    //激活账号。激活时会得到用户id和激活码
+    public int activation(int id,String activationCode){
+        User user = userMapper.selectById(id);
+        if(user.getStatus() == 1){
+            return ACTIVATION_REPEAT;
+        }else if(user.getActivationCode().equals(activationCode)){
+            userMapper.updateStatus(id,1);
+            return ACTIVATION_SUCCESS;
+        }else {
+            return ACTIVATION_FAILURE;
+        }
+    }
+
+
+
 
 }

@@ -18,6 +18,18 @@ spring:
       password: 596098
 
 
+# MailProperties
+  mail:
+    host: smtp.126.com
+    port: 465
+    username: liuyang_1026@126.com
+    password: BTKVIBQKMDEORWUZ
+    protocol: smtps
+
+
+
+
+
 # MybatisProperties
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -33,3 +45,9 @@ mybatis:
 #    com.newcoder.community: debug
 #  file:
 #    name: d:/linux/data/nowcoder/community.log
+
+
+community:
+  path:
+    domain: http://localhost:8080
+
