@@ -4,21 +4,28 @@ import com.google.code.kaptcha.Producer;
 import com.newcoder.community.entity.User;
 import com.newcoder.community.service.UserService;
 import com.newcoder.community.util.CommunityConstant;
+import com.sun.xml.internal.ws.developer.StreamingAttachment;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.crypto.interfaces.PBEKey;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.Map;
 
 /**
@@ -85,6 +92,7 @@ public class LoginController implements CommunityConstant {
     }
 
 
+
     @Autowired
     private Producer kaptchaProducer;
 
@@ -108,7 +116,53 @@ public class LoginController implements CommunityConstant {
         } catch (IOException e) {
            logger.error("响应验证码失败" + e.getMessage());
         }
+    }
 
+
+
+
+
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+    //处理登录信息
+    @PostMapping("/login")
+    //前面代码也有 /login 处理，但是get请求
+    public String login(String username,String password,String code,boolean rememberme,
+                        Model model,HttpSession session,HttpServletResponse response){
+
+        // 检查验证码
+        String kaptcha = (String) session.getAttribute("kaptcha");
+        if(StringUtils.isBlank(kaptcha) || StringUtils.isBlank(code) || !kaptcha.equalsIgnoreCase(code)){
+            model.addAttribute("codeMsg","验证码不正确");
+            return "/site/login";
+        }
+
+        //检查账号、密码
+        int expiredSeconds = rememberme ? REMEMBER_EXPIRED_SECONDS : DEFAULT_EXPIRED_SECONDS;
+        Map<String, Object> map = userService.login(username, password, expiredSeconds);
+        if(map.containsKey("ticket")){
+            Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
+            cookie.setPath(contextPath);
+            cookie.setMaxAge(expiredSeconds);
+            response.addCookie(cookie);
+            //如果是return视图名，是去访问html文件，而打开首页应该通过控制器方法去打开,所以要重定向
+            return "redirect:/index";
+        }else {
+            model.addAttribute("usernameMsg",map.get("usernameMsg"));
+            model.addAttribute("passwordMsg",map.get("passwordMsg"));
+            return "/site/login";
+        }
+    }
+
+
+
+    //处理退出业务
+    @GetMapping("/logout")
+    public String logout(@CookieValue("ticket") String ticket) {
+        userService.logout(ticket);
+        return "redirect:/login";
     }
 
 

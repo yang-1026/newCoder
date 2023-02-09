@@ -1,8 +1,10 @@
 package com.newcoder.community;
 
 import com.newcoder.community.dao.DiscussPostMapper;
+import com.newcoder.community.dao.LoginTicketMapper;
 import com.newcoder.community.dao.UserMapper;
 import com.newcoder.community.entity.DiscussPost;
+import com.newcoder.community.entity.LoginTicket;
 import com.newcoder.community.entity.User;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -81,5 +83,38 @@ public class MapperTests {
         System.out.println(rows);
     }
 
+
+
+
+
+    @Autowired(required = false)
+    private LoginTicketMapper loginTicketMapper;
+
+
+    @Test
+    public void testInsertLoginTicket(){
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(101);
+        loginTicket.setTicket("abc");
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
+    }
+
+
+    @Test
+    public void testSelectLoginTicket() {
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+    }
+
+
+    @Test
+    public void testUpdateLoginTicket() {
+        loginTicketMapper.updateStatus("abc",1);
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+    }
 
 }
