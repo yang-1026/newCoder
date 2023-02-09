@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.management.modelmbean.ModelMBeanOperationInfo;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -140,7 +143,48 @@ public class testControlller {
 
 
 
+    //cookie示例
+    //设置Cookie
+    @GetMapping("/cookie/set")
+    @ResponseBody
+    public String setCookie(HttpServletResponse response){
+        //创建cookie
+        Cookie cookie = new Cookie("code", "fdstw4w");
+        // 设置cookie生效的范围
+        cookie.setPath("/community/test");
+        //设置cookie的生存时间。默认cookie发送到浏览器存放在内存里，浏览器关闭cookie消失。若设置生存时间，则存放在硬盘里，当时间未结束时，即使浏览器关闭cookie也不会消失。
+        cookie.setMaxAge(60 * 10);
+        //发送cookie
+        response.addCookie(cookie);
+        return "set cookie";
+    }
+
+    //浏览器发送得到Cookie
+    @GetMapping("/cookie/get")
+    @ResponseBody
+    public String getCookie(@CookieValue("code") String code){
+        System.out.println(code);
+        return "get cookie";
+    }
 
 
+    //session示例
+    @GetMapping("/session/set")
+    @ResponseBody
+    public String setSession(HttpSession session){
+        session.setAttribute("id",1);
+        session.setAttribute("name","刘阳");
+        return "set session";
+    }
+
+
+
+    @GetMapping("/session/get")
+    @ResponseBody
+    public String getSession(HttpSession session){
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+        return "get session";
+    }
 
 }

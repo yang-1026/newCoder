@@ -1,10 +1,11 @@
 package com.newcoder.community.controller;
 
-import com.alibaba.druid.support.opds.udf.ExportSelectListColumns;
+import com.google.code.kaptcha.Producer;
 import com.newcoder.community.entity.User;
 import com.newcoder.community.service.UserService;
 import com.newcoder.community.util.CommunityConstant;
-import com.sun.org.apache.xpath.internal.operations.Mod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -75,6 +82,33 @@ public class LoginController implements CommunityConstant {
             model.addAttribute("target","/index");
         }
         return "/site/operate-result";
+    }
+
+
+    @Autowired
+    private Producer kaptchaProducer;
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    @GetMapping("/kaptcha")
+    //因为向浏览器输出的是验证码图片，不是字符串、html页面，所以使用void，自己使用response对象手动输出
+    public void getKaptcha(HttpServletResponse response, HttpSession session){
+        //生成验证码
+        String text = kaptchaProducer.createText();
+        BufferedImage image = kaptchaProducer.createImage(text);
+
+        // 将验证码存入session
+        session.setAttribute("kaptcha",text);
+
+        // 将图片输出给浏览器
+        response.setContentType("image/png");
+        try {
+            ServletOutputStream os = response.getOutputStream();
+            ImageIO.write(image,"png",os);
+        } catch (IOException e) {
+           logger.error("响应验证码失败" + e.getMessage());
+        }
+
     }
 
 
