@@ -1,9 +1,12 @@
 package com.newcoder.community.controller;
 
+import com.alibaba.druid.support.opds.udf.ExportSelectListColumns;
 import com.google.code.kaptcha.Producer;
 import com.newcoder.community.entity.User;
 import com.newcoder.community.service.UserService;
 import com.newcoder.community.util.CommunityConstant;
+import com.newcoder.community.util.CommunityUtil;
+import com.newcoder.community.util.MailClient;
 import com.sun.xml.internal.ws.developer.StreamingAttachment;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -12,10 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.crypto.interfaces.PBEKey;
 import javax.imageio.ImageIO;
@@ -157,13 +159,81 @@ public class LoginController implements CommunityConstant {
     }
 
 
-
     //处理退出业务
     @GetMapping("/logout")
     public String logout(@CookieValue("ticket") String ticket) {
         userService.logout(ticket);
         return "redirect:/login";
     }
+
+
+
+
+
+    //忘记密码界面
+    @GetMapping("/forget")
+    public String getForgetPage(){
+        return "/site/forget";
+    }
+
+
+    @Autowired(required = false)
+    private TemplateEngine templateEngine;
+
+    @Autowired
+    private MailClient mailClient;
+
+    // 获取验证码
+    @GetMapping("/forget/code")
+    @ResponseBody
+    public String getForgetCode(String email,HttpSession session){
+        if(StringUtils.isBlank(email)){
+            return CommunityUtil.getJSONString(1,"邮箱不能为空！");
+        }
+
+        // 校验邮箱是否注册，未注册则提示
+        boolean exist = userService.isEmailExist(email);
+        if(!exist){
+            return CommunityUtil.getJSONString(1, "该邮箱尚未注册！");
+        }
+
+
+        // 发送邮件
+        Context context = new Context();
+        context.setVariable("email",email);
+        String code = CommunityUtil.generateUUID().substring(0,4);
+        context.setVariable("verifyCode", code);
+        String content = templateEngine.process("/mail/forget", context);
+        mailClient.sendMail(email,"找回密码",content);
+
+        //session中保存验证码
+        session.setAttribute("verifyCode", code);
+        return CommunityUtil.getJSONString(0);
+    }
+
+
+    //重置密码
+    @PostMapping("/forget/password")
+    public String resetPassword(String email, String verifyCode, String password, Model model, HttpSession session){
+
+        // 检查验证码
+        String code = (String) session.getAttribute("verifyCode");
+        if (StringUtils.isBlank(verifyCode) || StringUtils.isBlank(code) || !code.equalsIgnoreCase(verifyCode)) {
+            model.addAttribute("codeMsg", "验证码错误!");
+            return "/site/forget";
+        }
+
+        Map<String, Object> map = userService.resetPassword(email, password);
+        if(map.containsKey("user")) {
+            return "redirect:/login";
+        }else {
+            model.addAttribute("emailMsg", map.get("emailMsg"));
+            model.addAttribute("passwordMsg", map.get("passwordMsg"));
+            return "/site/forget";
+        }
+    }
+
+
 
 
 }

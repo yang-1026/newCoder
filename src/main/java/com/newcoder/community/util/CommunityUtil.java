@@ -1,8 +1,11 @@
 package com.newcoder.community.util;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -30,5 +33,34 @@ public class CommunityUtil {
         }
         return DigestUtils.md5DigestAsHex(key.getBytes());
     }
+
+
+
+
+    //将String字符串转化为json格式
+    public static String getJSONString(int code, String msg, Map<String, Object> map){
+        Gson gson = new Gson();
+
+        HashMap<String, Object> map1 = new HashMap<>();
+        map1.put("code", code);
+        map1.put("msg", msg);
+        if(map != null){
+            for(String key : map.keySet()){
+                map1.put(key, map.get(key));
+            }
+        }
+        return gson.toJson(map1);
+    }
+
+
+    public static String getJSONString(int code, String msg){
+        return getJSONString(code, msg, null);
+    }
+
+    public static String getJSONString(int code){
+        return getJSONString(code, null, null);
+    }
+
+
 
 }

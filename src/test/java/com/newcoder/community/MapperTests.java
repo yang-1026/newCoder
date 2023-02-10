@@ -1,5 +1,6 @@
 package com.newcoder.community;
 
+import com.google.gson.Gson;
 import com.newcoder.community.dao.DiscussPostMapper;
 import com.newcoder.community.dao.LoginTicketMapper;
 import com.newcoder.community.dao.UserMapper;
@@ -13,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -115,6 +118,11 @@ public class MapperTests {
         loginTicketMapper.updateStatus("abc",1);
         LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
         System.out.println(loginTicket);
+
     }
+
+
+
+
 
 }
