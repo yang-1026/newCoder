@@ -221,6 +221,11 @@ public class UserService implements CommunityConstant {
     }
 
 
+    //查询用户凭证信息
+    public LoginTicket findLoginTicket(String ticket){
+        return loginTicketMapper.selectByTicket(ticket);
+    }
+
 
 
 }
