@@ -50,5 +50,8 @@ mybatis:
 community:
   path:
     domain: http://localhost:8080
+    #自己定义的文件上传地址
+    upload: d:/linux/img
+
 
 
