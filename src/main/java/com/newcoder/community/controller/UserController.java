@@ -1,5 +1,6 @@
 package com.newcoder.community.controller;
 
+import com.newcoder.community.annotation.LoginRequired;
 import com.newcoder.community.entity.User;
 import com.newcoder.community.service.UserService;
 import com.newcoder.community.util.CommunityUtil;
@@ -32,6 +33,7 @@ import java.util.Map;
 public class UserController {
 
     //访问设置页面
+    @LoginRequired
     @GetMapping("/setting")
     public String getSettingPage(){
         return "/site/setting";
@@ -57,6 +59,7 @@ public class UserController {
 
 
     //上传文件
+    @LoginRequired
     @PostMapping("/upload")
     public String uploadHeader(MultipartFile headerImage, Model model){
         if(headerImage == null){
