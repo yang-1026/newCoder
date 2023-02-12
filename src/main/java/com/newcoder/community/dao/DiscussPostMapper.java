@@ -23,4 +23,8 @@ public interface DiscussPostMapper {
     //获取信息总条数（不算拉黑帖子信息）
     int selectDiscussPostRows(@Param("userId") int userIed);
 
+
+    //增加新的帖子
+    int insertDiscussPost(DiscussPost discussPost);
+
 }

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+
 /**
  * @author liuyang
  * @create 2023-02-11 11:34
@@ -28,7 +30,10 @@ public class SensitiveTests {
         text = "efabc";
         text = sensitiveFilter.filter(text);
         System.out.println(text);
+
+
     }
 
+    
 
 }

@@ -1,6 +1,7 @@
 package com.newcoder.community.controller;
 
 import com.newcoder.community.service.AlphaService;
+import com.newcoder.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -186,5 +187,16 @@ public class testControlller {
         System.out.println(session.getAttribute("name"));
         return "get session";
     }
+
+
+    //ajax示例
+    @PostMapping("/ajax")
+    @ResponseBody
+    public String testAjax(String name,int age){
+        System.out.println(name);
+        System.out.println(age);
+        return CommunityUtil.getJSONString(0,"操作成功");
+    }
+
 
 }

@@ -39,7 +39,7 @@ public class SensitiveFilter {
     @PostConstruct
     public void init(){
 
-        // try()里的内容表示定义的流使用后可以被自动销毁，相当于在fainally中关闭流
+        // try()里的内容表示定义的流使用后可以被自动销毁，相当于在finally中关闭流
         try(
                 //字节流
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt");
