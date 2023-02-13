@@ -3,6 +3,7 @@ package com.newcoder.community.service;
 import com.newcoder.community.dao.DiscussPostMapper;
 import com.newcoder.community.entity.DiscussPost;
 import com.newcoder.community.util.SensitiveFilter;
+import com.sun.corba.se.spi.orb.ParserImplBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
@@ -52,6 +53,12 @@ public class DiscussPostService {
         post.setContent(sensitiveFilter.filter(post.getContent()));
 
         return discussPostMapper.insertDiscussPost(post);
+    }
+
+
+    //查询帖子
+    public DiscussPost findDiscussPostById(int id) {
+        return discussPostMapper.selectDiscussPostById(id);
     }
 
 }
