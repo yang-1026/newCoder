@@ -10,7 +10,13 @@
     </sql>
 
 
-<!--    List<Comment> selectCommentsByEntity(int entityType,int entityId,int offset,int limit);     -->
+    <sql id="insertFields">
+        user_id, entity_type, entity_id, target_id, content, status, create_time
+    </sql>
+
+
+
+    <!--    List<Comment> selectCommentsByEntity(int entityType,int entityId,int offset,int limit);     -->
     <select id="selectCommentsByEntity" resultType="comment">
         select <include refid="selectFields"></include>
         from comment
@@ -31,6 +37,13 @@
         and entity_type = #{entityType}
         and entity_id = #{entityId}
     </select>
+
+
+<!--    int insertComment(Comment comment);     -->
+    <insert id="insertComment" parameterType="comment">
+        insert into comment(<include refid="insertFields"></include>)
+        values(#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status},#{createTime})
+    </insert>
 
 
 </mapper>

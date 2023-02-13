@@ -78,7 +78,6 @@ public class DiscussPostController implements CommunityConstant {
         page.setRows(post.getCommentCount());
 
 
-
         // 评论: 给帖子的评论
         // 回复: 给评论的评论
         // 评论列表
