@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author liuyang
  * @create 2023-02-13 10:37
@@ -27,6 +31,8 @@ public class TransactionTests {
         Object obj = alphaService.save2();
         System.out.println(obj);
     }
+
+
 
 
 
