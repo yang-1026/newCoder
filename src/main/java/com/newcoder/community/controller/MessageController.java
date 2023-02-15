@@ -140,6 +140,7 @@ public class MessageController {
     @PostMapping("/letter/send")
     @ResponseBody
     public String sendLetter(String toName,String content){
+
         User target = userService.findUserByName(toName);
         if(target == null){
             return CommunityUtil.getJSONString(1,"目标用户不存在");
