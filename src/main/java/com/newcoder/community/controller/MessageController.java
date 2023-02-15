@@ -160,4 +160,14 @@ public class MessageController {
         return CommunityUtil.getJSONString(0);
     }
 
+
+    //删除私信
+    @PostMapping("/letter/delete")
+    @ResponseBody
+    public String deleteLetter(int id){
+        messageService.deleteMessage(id);
+        return CommunityUtil.getJSONString(0);
+    }
+
+
 }
