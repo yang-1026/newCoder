@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+
 
 /**
  * @author liuyang
@@ -30,10 +29,14 @@ public class TransactionTests {
     public void testSave2(){
         Object obj = alphaService.save2();
         System.out.println(obj);
+
     }
 
-
-
-
-
 }
+
+
+
+
+
+
+

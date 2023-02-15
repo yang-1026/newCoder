@@ -2,8 +2,10 @@ package com.newcoder.community.service;
 
 import com.newcoder.community.dao.MessageMapper;
 import com.newcoder.community.entity.Message;
+import com.newcoder.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 
@@ -40,5 +42,22 @@ public class MessageService {
         return messageMapper.selectLetterUnreadCount(userId, conversationId);
     }
 
+
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
+
+    //添加消息
+    public int addMessage(Message message){
+        message.setContent(HtmlUtils.htmlEscape(message.getContent()));
+        message.setContent(sensitiveFilter.filter(message.getContent()));
+
+        return messageMapper.insertMessage(message);
+    }
+
+
+    //修改消息状态为已读
+    public int updateMessageStatus(List<Integer> ids){
+        return messageMapper.updateStatus(ids,1);
+    }
 
 }
