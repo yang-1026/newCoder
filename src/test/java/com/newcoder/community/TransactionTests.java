@@ -1,6 +1,7 @@
 package com.newcoder.community;
 
 import com.google.code.kaptcha.Producer;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes;
 import com.newcoder.community.service.AlphaService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -10,8 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -37,6 +37,7 @@ public class TransactionTests {
         System.out.println(obj);
 
     }
+
 
 }
 

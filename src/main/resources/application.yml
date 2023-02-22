@@ -26,6 +26,13 @@ spring:
     password: BTKVIBQKMDEORWUZ
     protocol: smtps
 
+# RedisProperties
+  redis:
+    database: 11
+    host: 192.168.115.130
+    port: 6379
+    password: 596098
+
 
 
 
@@ -52,6 +59,8 @@ community:
     domain: http://localhost:8080
     #自己定义的文件上传地址
     upload: d:/linux/img
+
+
 
 
 
