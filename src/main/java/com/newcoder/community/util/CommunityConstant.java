@@ -50,5 +50,4 @@ public interface CommunityConstant {
      */
     int ENTITY_TYPE_USER = 3;
 
-
 }
