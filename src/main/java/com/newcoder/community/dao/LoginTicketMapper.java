@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.*;
 
 
 @Mapper
+//@Deprecated 表示此方法已废弃、暂时可用
+@Deprecated
 public interface LoginTicketMapper {
 
     @Insert({

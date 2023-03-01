@@ -1,7 +1,12 @@
 package com.newcoder.community.controller;
 
 import com.newcoder.community.entity.Comment;
+import com.newcoder.community.entity.DiscussPost;
+import com.newcoder.community.entity.Event;
+import com.newcoder.community.event.EventProducer;
 import com.newcoder.community.service.CommentService;
+import com.newcoder.community.service.DiscussPostService;
+import com.newcoder.community.util.CommunityConstant;
 import com.newcoder.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,13 +23,19 @@ import java.util.Date;
 
 @Controller
 @RequestMapping("/comment")
-public class CommentController {
+public class CommentController implements CommunityConstant {
 
     @Autowired
     private CommentService commentService;
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Autowired
+    private DiscussPostService discussPostService;
+
+    @Autowired
+    private EventProducer eventProducer;
 
 
     @PostMapping("/add/{discussPostId}")
@@ -33,6 +44,22 @@ public class CommentController {
         comment.setStatus(0);
         comment.setCreateTime(new Date());
         commentService.addComment(comment);
+
+        //触发评论事件
+        Event event = new Event()
+                .setTopic(TOPIC_COMMENT)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(comment.getEntityType())
+                .setEntityId(comment.getEntityId())
+                .setData("postId",discussPostId);
+        if(comment.getEntityType() == ENTITY_TYPE_POST){
+            DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
+            event.setEntityUserId(target.getUserId());
+        }else if(comment.getEntityType() == ENTITY_TYPE_COMMENT){
+            Comment target = commentService.findCommentById(comment.getEntityId());
+            event.setEntityUserId(target.getUserId());
+        }
+        eventProducer.fireEvent(event);
 
         return "redirect:/discuss/detail/" + discussPostId;
     }

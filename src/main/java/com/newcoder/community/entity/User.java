@@ -1,6 +1,7 @@
 package com.newcoder.community.entity;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author liuyang
@@ -121,4 +122,5 @@ public class User {
                 ", createTime=" + createTime +
                 '}';
     }
+
 }
