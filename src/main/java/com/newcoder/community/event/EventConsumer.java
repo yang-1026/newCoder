@@ -1,7 +1,7 @@
 package com.newcoder.community.event;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.newcoder.community.entity.Event;
 import com.newcoder.community.entity.Message;
 import com.newcoder.community.service.MessageService;
@@ -39,7 +39,7 @@ public class EventConsumer implements CommunityConstant {
         }
 
         Gson gson = new Gson();
-        Event event = gson.fromJson(record.value().toString(), Event.class);
+        Event event = JSONObject.parseObject(record.value().toString(), Event.class);
         if(event == null){
             logger.error("消息格式错误！");
             return;
@@ -63,7 +63,7 @@ public class EventConsumer implements CommunityConstant {
             }
         }
 
-        message.setContent(new Gson().toJson(content));
+        message.setContent(JSONObject.toJSONString(content));
 
         messageService.addMessage(message);
     }

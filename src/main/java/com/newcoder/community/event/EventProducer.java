@@ -1,5 +1,6 @@
 package com.newcoder.community.event;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.newcoder.community.entity.Event;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class EventProducer {
     public void fireEvent(Event event){
         Gson gson = new Gson();
         //将事件发布到指定主题
-        kafkaTemplate.send(event.getTopic(),gson.toJson(event));
+        kafkaTemplate.send(event.getTopic(), JSONObject.toJSONString(event));
     }
 
 }
